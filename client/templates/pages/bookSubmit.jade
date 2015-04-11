@@ -1,0 +1,69 @@
+template(name='bookSubmit')
+  script.
+    $( document ).ready( function(){
+      $(document).on('click','#searchBookBtn' , function () {
+    $('#google-book').removeClass("hidden");
+    isbn = $('#searchBook').val();
+    //- available = $('.avail').text();
+    var googleAPI = "https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn ;
+    $.getJSON(googleAPI, function (response) {
+    
+    // In console, you can see the response objects
+    console.log("JSON Data: " + response.items);
+    
+    // Loop through all the items one-by-one
+    for (var i = 0; i < response.items.length; i++) {
+      
+      // set the item from the response object
+      var item = response.items[i];
+      var rating = response.items[0].volumeInfo.averageRating;
+      var author = response.items[0].volumeInfo.authors[0];
+      var title = response.items[0].volumeInfo.title;
+      var cover =  item.volumeInfo.imageLinks == undefined ?  'http://placekitten.com/g/200/300' : item.volumeInfo.imageLinks.thumbnail;
+      var description = response.items[0].volumeInfo.description;
+      // Set the book title in the div
+      }
+      $( ".cover" ).html( "<img src="+cover+">");  
+      $( ".author" ).html( author );  
+      $( ".description" ).html( description );  
+      $( ".title" ).html( title );
+      //- if (true) alert(1);
+      //- document.getElementById('available').innerText() = (available === 'true' ? 'Available' : 'Unavailable');
+      for (var j = 0; j< rating; j++) {
+        $( ".rating" ).append( "<span class='full-star'>★</span>" );
+        }
+        for (var j = 0; j< 5-rating; j++) {
+          $( ".rating" ).append( "<span>★</span>" );
+          }
+          });
+          });
+      });
+  
+  .container
+    .text-center
+      .content
+        .row
+          .col-xs-9
+            input.form-control#searchBook(type='text', placeholder='Search by ISBN')
+          .col-xs-3
+            button.btn.btn-default#searchBookBtn Search
+        .container#google-book.hidden
+          .row.book-item
+            .col-xs-3
+              .cover
+            .col-xs-9
+              .row
+                .col-xs-12
+                  h2 
+                    span.title
+                    .right#available 
+                  h4 by 
+                  span.author
+                  .rating
+                  .description
+          
+        
+      .content
+          br
+          button.btn.btn-default#submitBook.pull-left
+            span Add Book

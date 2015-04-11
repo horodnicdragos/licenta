@@ -1,0 +1,76 @@
+template(name='profile')
+  .container
+    .row
+      .col-sm-3
+        .profile.picture
+          img(src='Like this: http://placekitten.com/200/200').img-circle
+        .profile.username
+          h2 #{username.name}
+        //- .profile.email
+        //-   h2 #{username.mail}
+        .profile.city
+          h4 #{username.city}
+        .profile.country
+          h4 #{username.country}
+        .profile.rank
+          h4 Level 
+            span.green.levelCounter 1 
+        .profile.read-books
+          p #{booksRead} books read.
+            //-#{level}
+          .progress
+            .progress-bar.progress-bar-warning.progress-bar-striped.active(role='progressbar', aria-valuenow='45', aria-valuemin='0', aria-valuemax='100', style='width: 45%')
+          //- span.sr-only 45% Complete
+        .profile.submit
+          a(href='/submit')
+            button.btn.btn-default Submit book
+      .col-sm-9
+        h1 Borrowed books
+        each borrowedBooks
+          .book(id='#{_id}').row
+            .col-xs-3
+              img(src="#{bookImage}")
+            .col-xs-9
+              h2 #{bookName}
+              span #{bookAuthor}
+              br
+              span !{bookrating}
+              //- span.text - #{daysLeft} days
+              .pull-right
+                button.btn.btn-warning#doneReading Done
+    .hidden
+      if currentUser
+        h1 Settings
+        hr
+        .user-info
+          .mail.hidden
+            span #{username.mail}
+          .panel.panel-default
+            .panel-heading
+              h3.panel-title Basic information
+            .panel-body
+              .row
+                .col-sm-offset-3.col-xs-3
+                  p Name
+                .col-xs-9.col-sm-6
+                  p
+                    input#name(type='text', placeholder='Edit Name ...')
+              .row
+                .col-sm-offset-3.col-xs-3
+                  p Email
+                .col-xs-9.col-sm-6
+                  p
+                    input#email(type='email', placeholder='Edit Email ...')
+              .row
+                .col-sm-offset-3.col-xs-3
+                  p City
+                .col-xs-9.col-sm-6
+                  p
+                    input#city(type='text', placeholder='Edit City ...')
+              .row
+                .col-sm-offset-3.col-xs-3
+                  p Country
+                .col-xs-9.col-sm-6
+                  p
+                    input#country(type='text', placeholder='Edit Country ...')
+              button#ok-button.btn.btn-default.pull-right(type='button') Save
