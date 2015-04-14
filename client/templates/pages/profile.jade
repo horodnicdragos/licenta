@@ -3,7 +3,7 @@ template(name='profile')
     .row
       .col-sm-3
         .profile.picture
-          img(src='Like this: http://placekitten.com/200/200').img-circle
+          img(src='http://placekitten.com/200/200').img-circle
         .profile.username
           h2 #{username.name}
         //- .profile.email
@@ -25,19 +25,19 @@ template(name='profile')
           a(href='/submit')
             button.btn.btn-default Submit book
       .col-sm-9
-        h1 Borrowed books
-        each borrowedBooks
-          .book(id='#{_id}').row
-            .col-xs-3
-              img(src="#{bookImage}")
-            .col-xs-9
-              h2 #{bookName}
-              span #{bookAuthor}
-              br
-              span !{bookrating}
-              //- span.text - #{daysLeft} days
-              .pull-right
-                button.btn.btn-warning#doneReading Done
+        h1 Profile
+        //- each borrowedBooks
+        //-   .book(id='#{_id}').row
+        //-     .col-xs-3
+        //-       img(src="#{bookImage}")
+        //-     .col-xs-9
+        //-       h2 #{bookName}
+        //-       span #{bookAuthor}
+        //-       br
+        //-       span !{bookrating}
+        //-       //- span.text - #{daysLeft} days
+        //-       .pull-right
+        //-         button.btn.btn-warning#doneReading Done
     .hidden
       if currentUser
         h1 Settings

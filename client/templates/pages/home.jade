@@ -5,16 +5,11 @@ template(name='home')
         // Default panel contents
         .panel-heading Rate recent suggestions
         ul.list-group
-          li.list-group-item
-            //- div #{recentPlace.name}
-            //- div #{recentPlace.type}
-            div Place
-            div Place type
-            #add-rating.rateit
-          li.list-group-item Dapibus ac facilisis in
-          li.list-group-item Morbi leo risus
-          li.list-group-item Porta ac consectetur ac
-          li.list-group-item Vestibulum at eros
+          each profile.places
+            li.list-group-item
+              div #{this.name}
+              div #{this.type}
+              #add-rating.rateit
 
 
 

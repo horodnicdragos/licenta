@@ -1,8 +1,32 @@
+// Google Maps Api
 if (Meteor.isClient) {
   Meteor.startup(function() {
     GoogleMaps.load();
   });
 }
+Template.home.helpers({
+  MapOptions: function() {
+    // Make sure the maps API has loaded
+    if (GoogleMaps.loaded()) {
+      // Map initialization options
+      return {
+        center: new google.maps.LatLng(44.4298, 26.1326),
+        zoom: 8
+      };
+    }
+  }
+});
+
+Template.home.onCreated(function() {
+  // We can use the `ready` callback to interact with the map API once the map is ready.
+  GoogleMaps.ready('Map', function(map) {
+    // Add a marker to the map once it's ready
+    var marker = new google.maps.Marker({
+      position: map.options.center,
+      map: map.instance
+    });
+  });
+});
 
 // .rateit elements need to be progressively enhanced after they're created
 Template.home.rendered = function () {
@@ -10,6 +34,7 @@ Template.home.rendered = function () {
   this.$('.rateit').rateit();
 }
 
+// Logic
 Template.home.events({
   'click #searchBookBtn': function () {
     var a = Books.findOne({
@@ -35,29 +60,9 @@ Template.home.helpers({
     });
     console.log(a);
     return a;
+  },
+  profile: function() {
+    var profile = Profiles.findOne({});
+    return profile;
   }
-});
-
-Template.home.helpers({
-  MapOptions: function() {
-    // Make sure the maps API has loaded
-    if (GoogleMaps.loaded()) {
-      // Map initialization options
-      return {
-        center: new google.maps.LatLng(44, 26),
-        zoom: 8
-      };
-    }
-  }
-});
-
-Template.home.onCreated(function() {
-  // We can use the `ready` callback to interact with the map API once the map is ready.
-  GoogleMaps.ready('Map', function(map) {
-    // Add a marker to the map once it's ready
-    var marker = new google.maps.Marker({
-      position: map.options.center,
-      map: map.instance
-    });
-  });
 });
