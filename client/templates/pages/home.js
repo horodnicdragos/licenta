@@ -28,11 +28,6 @@ Template.home.onCreated(function() {
   });
 });
 
-// .rateit elements need to be progressively enhanced after they're created
-Template.home.rendered = function () {
-  // at .created() time, it's too early to run rateit(), so run it at rendered()
-  this.$('.rateit').rateit();
-}
 
 // Logic
 Template.home.events({
@@ -48,6 +43,32 @@ Template.home.events({
     Books.update ({'_id':this._id}, {$set: {'currentUser': Meteor.user()._id }});
     Meteor.users.update ({'_id': Meteor.user()._id}, {$addToSet: {'borrowedBooks': this._id}});
     $('.borrow').parent().html("<i class='fa fa-check fa-3x' style='color: #009E78;'></i>");
+  },
+  'click .stars-rating': function () {
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+      console.log(email);
+    }
+    var rating = $('#'+this.id).data('userrating');
+    console.log(this.id);
+    console.log(rating);
+    // profile = Profiles.find({email:email});
+    // var docid = Profiles.findOne({'email': email, 'places.place_id':this.id});
+    // Profiles.update ({_id:docid._id}, {$set: {'places.$.rating': rating }});
+    Meteor.call('updateRecentPlaceRating', email, rating, this.id);
+    // Profiles.update ({'email': email, 'places.place_id':this.id}, {$set: {'places.$.rating': rating }});
+    // var places = Profiles.find({"places": {"$elemMatch": {"place_id": this.id}}});
+
+    // profile.update({'places.place_id':this._id}, {$set: {'places.$.rating': rating }});
+    // Profiles.update ({'email': email, 'places.place_id':this._id}, {$set: {'rating': rating }});
+    // console.log(docid);
+    // console.log(profile);
+    // profile.forEach(function(el){
+    //   if(el.place_id === this.id)
+    //     console.log('e ok');
+    //     console.log(el);
+    // });
+
   }
 });
 
@@ -62,7 +83,11 @@ Template.home.helpers({
     return a;
   },
   profile: function() {
-    var profile = Profiles.findOne({});
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+      console.log(email);
+    }
+    var profile = Profiles.findOne({email:email});
     return profile;
   }
 });

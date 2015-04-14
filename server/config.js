@@ -8,3 +8,13 @@ Accounts.onCreateUser(function(options, user) {
 
   return user;
 });
+
+Meteor.methods({
+  updateRecentPlaceRating: function (email, rating, id) {
+    // Check argument types
+    check(email, String);
+    check(rating, Number);
+    check(id, Number);
+    Profiles.update ({'email': email, 'places.place_id':id}, {$set: {'places.$.rating': rating }});
+  }
+});

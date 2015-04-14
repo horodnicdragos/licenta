@@ -6,14 +6,11 @@ template(name='home')
         .panel-heading Rate recent suggestions
         ul.list-group
           each profile.places
-            li.list-group-item
-              div #{this.name}
-              div #{this.type}
-              #add-rating.rateit
-
-
-
-
+            if (this.recent)
+              li.list-group-item
+                div #{this.name}
+                div #{this.type}
+                | {{> starsRating rating=this.rating size=16 mutable=true id=this.place_id}}
     .col-xs-12.col-sm-8
       .map-container
         | {{> googleMap name="Map" options=MapOptions}}
