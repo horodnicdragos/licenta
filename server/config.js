@@ -1,3 +1,13 @@
+var connectHandler = WebApp.connectHandlers; // get meteor-core's connect-implementation
+
+// attach connect-style middleware for response header injection
+Meteor.startup(function () {
+  connectHandler.use(function (req, res, next) {
+    res.setHeader('Strict-Transport-Security', 'max-age=2592000; includeSubDomains'); // 2592000s / 30 days
+    return next();
+  })
+})
+
 Accounts.onCreateUser(function(options, user) {
 
   user.books = [];
@@ -16,5 +26,8 @@ Meteor.methods({
     check(rating, Number);
     check(id, Number);
     Profiles.update ({'email': email, 'places.place_id':id}, {$set: {'places.$.rating': rating }});
+  },
+  getPlaces: function(){
+      return Meteor.http.call('GET', 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1057362&radius=5000&types=food&key=AIzaSyArmFhKvB-NI8jun40lFYaHlGciqVm1RW4');
   }
 });

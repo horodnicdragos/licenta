@@ -1,3 +1,10 @@
+Meteor.setTimeout(function() {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        Session.set('lat', position.coords.latitude);
+        Session.set('lon', position.coords.longitude);
+    });
+}, 5000);
+
 // Google Maps Api
 if (Meteor.isClient) {
   Meteor.startup(function() {
@@ -10,7 +17,7 @@ Template.home.helpers({
     if (GoogleMaps.loaded()) {
       // Map initialization options
       return {
-        center: new google.maps.LatLng(44.4298, 26.1326),
+        center: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
         zoom: 8
       };
     }
@@ -22,7 +29,7 @@ Template.home.onCreated(function() {
   GoogleMaps.ready('Map', function(map) {
     // Add a marker to the map once it's ready
     var marker = new google.maps.Marker({
-      position: map.options.center,
+      position: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
       map: map.instance
     });
   });
@@ -52,22 +59,7 @@ Template.home.events({
     var rating = $('#'+this.id).data('userrating');
     console.log(this.id);
     console.log(rating);
-    // profile = Profiles.find({email:email});
-    // var docid = Profiles.findOne({'email': email, 'places.place_id':this.id});
-    // Profiles.update ({_id:docid._id}, {$set: {'places.$.rating': rating }});
     Meteor.call('updateRecentPlaceRating', email, rating, this.id);
-    // Profiles.update ({'email': email, 'places.place_id':this.id}, {$set: {'places.$.rating': rating }});
-    // var places = Profiles.find({"places": {"$elemMatch": {"place_id": this.id}}});
-
-    // profile.update({'places.place_id':this._id}, {$set: {'places.$.rating': rating }});
-    // Profiles.update ({'email': email, 'places.place_id':this._id}, {$set: {'rating': rating }});
-    // console.log(docid);
-    // console.log(profile);
-    // profile.forEach(function(el){
-    //   if(el.place_id === this.id)
-    //     console.log('e ok');
-    //     console.log(el);
-    // });
 
   }
 });
@@ -87,6 +79,13 @@ Template.home.helpers({
       var email = Meteor.user().emails[0].address;
       console.log(email);
     }
+
+    // Meteor.call('getPlaces',function(err,results){
+    //     console.log(results.content);
+    //     Session.set('places',JSON.parse(results.content));
+    // });
+    // console.log(Session.get('places'))
+
     var profile = Profiles.findOne({email:email});
     return profile;
   }
