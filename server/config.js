@@ -21,13 +21,20 @@ Accounts.onCreateUser(function(options, user) {
 
 Meteor.methods({
   updateRecentPlaceRating: function (email, rating, id) {
-    // Check argument types
     check(email, String);
     check(rating, Number);
     check(id, Number);
     Profiles.update ({'email': email, 'places.place_id':id}, {$set: {'places.$.rating': rating }});
   },
-  getPlaces: function(){
-      return Meteor.http.call('GET', 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1057362&radius=5000&types=food&key=AIzaSyArmFhKvB-NI8jun40lFYaHlGciqVm1RW4');
+  // getFriends: function (email) {
+  //   check(email, String);
+  //   return Profiles.find({'email': email}, {'friends':1});
+  // },
+  getPlaces: function(lon, lat, radius, type){
+    check(lon, Number);
+    check(lat, Number);
+    check(radius, Number);
+    check(type, String);
+      return Meteor.http.call('GET', 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lon+','+lat+'&radius='+radius+'&types='+type+'&key=AIzaSyArmFhKvB-NI8jun40lFYaHlGciqVm1RW4');
   }
 });

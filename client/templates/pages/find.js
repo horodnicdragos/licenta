@@ -1,6 +1,38 @@
+Friends = new Mongo.Collection();
+
+
+Template.find.helpers({
+  settings: function() {
+    return {
+      position: Session.get("position"),
+      limit: 10,
+      rules: [
+        {
+          // token: '',
+          collection: Friends,
+          field: 'email',
+          matchAll: true,
+          template: Template.standardLegends
+        }
+      ]
+    };
+  },
+  legends: function() {
+    // console.log(Meteor.call('getFriends', Session.get('email')));
+    return Friends.find({});
+  }
+});
+
 // Google Maps Api
 if (Meteor.isClient) {
   Meteor.startup(function() {
+    if(Meteor.user()){
+      Session.set('email', Meteor.user().emails[0].address);
+    }
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+    }
+
     navigator.geolocation.getCurrentPosition(function(position) {
     Session.set('lat', position.coords.latitude);
     Session.set('lon', position.coords.longitude);
@@ -8,20 +40,20 @@ if (Meteor.isClient) {
     });
   });
 }
-Template.home.helpers({
+Template.find.helpers({
   MapOptions: function() {
     // Make sure the maps API has loaded
     if (GoogleMaps.loaded()) {
       // Map initialization options
       return {
         center: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
-        zoom: 16
+        zoom: 8
       };
     }
   }
 });
 
-Template.home.onCreated(function() {
+Template.find.onCreated(function() {
   // We can use the `ready` callback to interact with the map API once the map is ready.
   GoogleMaps.ready('Map', function(map) {
     // Add a marker to the map once it's ready
@@ -34,7 +66,7 @@ Template.home.onCreated(function() {
 
 
 // Logic
-Template.home.events({
+Template.find.events({
   'click #searchBookBtn': function () {
     var a = Books.findOne({
       name: $('input#searchBook').val()
@@ -61,7 +93,7 @@ Template.home.events({
   }
 });
 
-Template.home.helpers({
+Template.find.helpers({
   books: function() {
     var a = [];
     var x = Books.find({});
@@ -73,29 +105,27 @@ Template.home.helpers({
   },
   profile: function() {
     if(Meteor.user()){
-
-      Session.set('email', Meteor.user().emails[0].address);
-      console.log(Session.get('email'));
-    }
-    if(Meteor.user()){
       var email = Meteor.user().emails[0].address;
       console.log(email);
-      var friends = Profiles.find({'email': email}, {fields:{'friends':1}}).fetch()[0].friends;
+      var friends = Profiles.find({'email': email}, {fields:{'friends':1}});
       console.log(friends);
       console.log('pula');
-      for(i in friends){
+      friends.forEach(function (el){
+        Friends.insert(el);
+      });
 
-        Friends.insert({ email: friends[i] , gravatar: CryptoJS.MD5(friends[i])});
-      }
     }
 
-    // Meteor.call('getPlaces',function(err,results){
+    // Meteor.call('getPlaces',lon, lat, radius, type, function(err,results){
     //     console.log(results.content);
     //     Session.set('places',JSON.parse(results.content));
     // });
     // console.log(Session.get('places'))
 
-    var profile = Profiles.findOne({email:Session.get('email')});
+    var profile = Profiles.findOne({email:email});
     return profile;
+  },
+  gravatarHash: function() {
+    return CryptoJS.MD5(Session.get('email')).toString();
   }
 });

@@ -1,0 +1,44 @@
+template(name='find')
+  script(src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places")
+  .container.row
+    .col-xs-12.col-sm-4
+      .panel.panel-default.suggestions
+        .panel-heading Places Menu
+        .panel-body
+          .btn-group.btn-group-justified
+            .btn.btn-primary Find Place
+        ul.list-group
+          li.list-group-item
+            h4 Options
+            br
+            div What kind of place are you looking for?
+            br
+            .btn-group.btn-group-justified
+              .btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-expanded='false')
+                | Action 
+                span.caret
+              ul.dropdown-menu(role='menu')
+                li
+                  a(href='#') Action
+                li
+                  a(href='#') Another action
+                li
+                  a(href='#') Something else here
+                li.divider
+                li
+                  a(href='#') Separated link
+            br
+            div Friends (for group based recommendations)
+            br
+            div
+              | {{> inputAutocomplete settings=settings id="legend" class="form-control" name="legend" placeholder="Legend" }}
+              //- input.form-control(type='text', placeholder="Type friends' email", aria-describedby='basic-addon1')
+    .col-xs-12.col-sm-8
+      .suggestions
+        .map-container
+          //- | {{> googleMap name="Map"}}
+          | {{> googleMap name="Map" options=MapOptions}}
+        .suggestions-panel.panel.panel-default
+          .panel-heading Suggestion
+template(name='standardLegends')
+  | <span><img src='http://www.gravatar.com/avatar/{{gravatar}}?s=50'/></span><span style="color: {{color}}; background-color: {{bg}};">{{email}}</span>

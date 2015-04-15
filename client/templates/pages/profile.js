@@ -55,6 +55,9 @@ Template.profile.helpers({
 
   booksRead: function () {
     return '5';
+  },
+  gravatarHash: function() {
+    return CryptoJS.MD5(Session.get('email')).toString()
   }
 });
 

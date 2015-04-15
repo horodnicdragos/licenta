@@ -8,20 +8,20 @@ if (Meteor.isClient) {
     });
   });
 }
-Template.home.helpers({
+Template.friends.helpers({
   MapOptions: function() {
     // Make sure the maps API has loaded
     if (GoogleMaps.loaded()) {
       // Map initialization options
       return {
         center: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
-        zoom: 16
+        zoom: 8
       };
     }
   }
 });
 
-Template.home.onCreated(function() {
+Template.friends.onCreated(function() {
   // We can use the `ready` callback to interact with the map API once the map is ready.
   GoogleMaps.ready('Map', function(map) {
     // Add a marker to the map once it's ready
@@ -34,7 +34,7 @@ Template.home.onCreated(function() {
 
 
 // Logic
-Template.home.events({
+Template.friends.events({
   'click #searchBookBtn': function () {
     var a = Books.findOne({
       name: $('input#searchBook').val()
@@ -61,7 +61,7 @@ Template.home.events({
   }
 });
 
-Template.home.helpers({
+Template.friends.helpers({
   books: function() {
     var a = [];
     var x = Books.find({});
@@ -73,20 +73,8 @@ Template.home.helpers({
   },
   profile: function() {
     if(Meteor.user()){
-
-      Session.set('email', Meteor.user().emails[0].address);
-      console.log(Session.get('email'));
-    }
-    if(Meteor.user()){
       var email = Meteor.user().emails[0].address;
       console.log(email);
-      var friends = Profiles.find({'email': email}, {fields:{'friends':1}}).fetch()[0].friends;
-      console.log(friends);
-      console.log('pula');
-      for(i in friends){
-
-        Friends.insert({ email: friends[i] , gravatar: CryptoJS.MD5(friends[i])});
-      }
     }
 
     // Meteor.call('getPlaces',function(err,results){
@@ -95,7 +83,7 @@ Template.home.helpers({
     // });
     // console.log(Session.get('places'))
 
-    var profile = Profiles.findOne({email:Session.get('email')});
+    var profile = Profiles.findOne({email:email});
     return profile;
   }
 });
