@@ -51,11 +51,8 @@ Template.home.events({
   'click .stars-rating': function () {
     if(Meteor.user()){
       var email = Meteor.user().emails[0].address;
-      console.log(email);
     }
     var rating = $('#'+this.id).data('userrating');
-    console.log(this.id);
-    console.log(rating);
     Meteor.call('updateRecentPlaceRating', email, rating, this.id);
 
   }
@@ -73,20 +70,7 @@ Template.home.helpers({
   },
   profile: function() {
     if(Meteor.user()){
-
       Session.set('email', Meteor.user().emails[0].address);
-      console.log(Session.get('email'));
-    }
-    if(Meteor.user()){
-      var email = Meteor.user().emails[0].address;
-      console.log(email);
-      var friends = Profiles.find({'email': email}, {fields:{'friends':1}}).fetch()[0].friends;
-      console.log(friends);
-      console.log('pula');
-      for(i in friends){
-
-        Friends.insert({ email: friends[i] , gravatar: CryptoJS.MD5(friends[i])});
-      }
     }
 
     // Meteor.call('getPlaces',function(err,results){

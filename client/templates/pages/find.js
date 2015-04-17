@@ -1,5 +1,17 @@
 Friends = new Mongo.Collection();
-
+Group = new Mongo.Collection();
+function getFriends(){
+    var data = Friends.find();
+    if(Meteor.user()&&!data.count()){
+      var email = Meteor.user().emails[0].address;
+      var friends = Profiles.find({'email': email}, {fields:{'friends':1}}).fetch()[0].friends;
+      for(i in friends){
+        Friends.insert({ email: friends[i] , gravatar: CryptoJS.MD5(friends[i]).toString()});
+        Meteor.clearInterval(getFriends);
+      }
+    }
+};
+getFriends = Meteor.setInterval(getFriends, 1000);
 
 Template.find.helpers({
   settings: function() {
@@ -18,6 +30,7 @@ Template.find.helpers({
     };
   },
   legends: function() {
+
     // console.log(Meteor.call('getFriends', Session.get('email')));
     return Friends.find({});
   }
@@ -67,28 +80,54 @@ Template.find.onCreated(function() {
 
 // Logic
 Template.find.events({
-  'click #searchBookBtn': function () {
-    var a = Books.findOne({
-      name: $('input#searchBook').val()
-    });
-    console.log(a);
-    $('.bookResult').html();
+  'click #add-friend-to-group': function () {
+    var email = $('#legend').val();
+    if (Friends.find({'email':email}).count()){
+    console.log(email);
+    var gravatar = CryptoJS.MD5(email).toString();
+    console.log(gravatar);
+    $('.group-container').append("<span class='click-avatar' id='"+gravatar+"'><span data-content='✕' class='image'><img src='http://www.gravatar.com/avatar/"+gravatar+"?s=40' class='img-circle mini-avatar'/></span></span>");
+    var obj = Friends.find({'email':email}).fetch();
+    console.log(obj[0].email);
+    Group.insert(obj[0]);
+    Friends.remove(obj[0]);
+    }
+    $('#legend').val('');
   },
 
-  'click .borrow': function () {
-    Books.update ({'_id':this._id}, {$set: {'currentUser': Meteor.user()._id }});
-    Meteor.users.update ({'_id': Meteor.user()._id}, {$addToSet: {'borrowedBooks': this._id}});
-    $('.borrow').parent().html("<i class='fa fa-check fa-3x' style='color: #009E78;'></i>");
+  'click #find-places': function () {
+    var places;
+    var semaphore = 0;
+    Meteor.call('getPlaces', Session.get('lon'), Session.get('lat'), 1000, 'restaurant', function(err,results){
+        // console.log(results.content);
+        Session.set('places',JSON.parse(results.content));
+        places =  Session.get('places');
+        semaphore = 1;
+    });
+    getPlaces = Meteor.setInterval(function(){
+      if(semaphore === 1){
+      semaphore = 0;
+      console.log(places);
+      console.log(typeof(places));
+      Meteor.clearInterval(getPlaces);
+      //Iterating though the given places
+        places.results.forEach(function(el){
+          console.log(el.name);
+        });
+      }
+    }, 1000);
+    // Books.update ({'_id':this._id}, {$set: {'currentUser': Meteor.user()._id }});
+    // Meteor.users.update ({'_id': Meteor.user()._id}, {$addToSet: {'borrowedBooks': this._id}});
+    // $('.borrow').parent().html("<i class='fa fa-check fa-3x' style='color: #009E78;'></i>");
   },
-  'click .stars-rating': function () {
-    if(Meteor.user()){
-      var email = Meteor.user().emails[0].address;
-      console.log(email);
-    }
-    var rating = $('#'+this.id).data('userrating');
-    console.log(this.id);
-    console.log(rating);
-    Meteor.call('updateRecentPlaceRating', email, rating, this.id);
+  'click .click-avatar': function (event) {
+    console.log(event.currentTarget.id);
+    var gravatar = event.currentTarget.id;
+    var obj = Group.find({'gravatar':gravatar}).fetch();
+    console.log(obj);
+    Friends.insert(obj[0]);
+    Group.remove(obj[0]);
+    $('#'+event.currentTarget.id).remove();
 
   }
 });
@@ -116,11 +155,7 @@ Template.find.helpers({
 
     }
 
-    // Meteor.call('getPlaces',lon, lat, radius, type, function(err,results){
-    //     console.log(results.content);
-    //     Session.set('places',JSON.parse(results.content));
-    // });
-    // console.log(Session.get('places'))
+
 
     var profile = Profiles.findOne({email:email});
     return profile;

@@ -1,44 +1,66 @@
 template(name='find')
   script(src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places")
   .container.row
-    .col-xs-12.col-sm-4
-      .panel.panel-default.suggestions
+    .col-xs-12
+      .panel.panel-default
         .panel-heading Places Menu
         .panel-body
-          .btn-group.btn-group-justified
-            .btn.btn-primary Find Place
+          .row
+            .col-sm-8
+              .row
+                .col-xs-12
+                  span What kind of place are you looking for? 
+              .row
+                .col-xs-12
+                  //- .btn-group.btn-group-justified
+                  span.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-expanded='false')
+                    | Pick
+                    span.caret
+                  ul.dropdown-menu(role='menu')
+                    li
+                      a(href='#') Food
+                    li
+                      a(href='#') Cafe & Bar
+                    li
+                      a(href='#') Park
+                    li
+                      a(href='#') Library
+                    li
+                      a(href='#') Club
+                    li
+                      a(href='#') Clothing
+                    li
+                      a(href='#') Mall
+                    li
+                      a(href='#') Cinema
+                    li.divider
+                    li
+                      a(href='#') Random
+            .col-sm-4
+              .btn-group.pull-right#find-places
+                .btn.btn-primary Find Place
         ul.list-group
           li.list-group-item
-            h4 Options
-            br
-            div What kind of place are you looking for?
-            br
-            .btn-group.btn-group-justified
-              .btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-expanded='false')
-                | Action 
-                span.caret
-              ul.dropdown-menu(role='menu')
-                li
-                  a(href='#') Action
-                li
-                  a(href='#') Another action
-                li
-                  a(href='#') Something else here
-                li.divider
-                li
-                  a(href='#') Separated link
-            br
-            div Friends (for group based recommendations)
-            br
-            div
-              | {{> inputAutocomplete settings=settings id="legend" class="form-control" name="legend" placeholder="Legend" }}
+            .row
+              .col-xs-12 Friends (for group based recommendations)
+            .row 
+              .col-xs-12
+                br
+                | {{> inputAutocomplete settings=settings id="legend" class="form-control" name="legend" placeholder="Type in email of friend" }}
+            .row
+              .col-xs-10.group-container
+              .col-xs-2
+                br
+                .btn.pull-right.btn-default#add-friend-to-group Add
               //- input.form-control(type='text', placeholder="Type friends' email", aria-describedby='basic-addon1')
-    .col-xs-12.col-sm-8
-      .suggestions
-        .map-container
-          //- | {{> googleMap name="Map"}}
-          | {{> googleMap name="Map" options=MapOptions}}
-        .suggestions-panel.panel.panel-default
-          .panel-heading Suggestion
+  .container.row
+    .col-xs-12
+      .suggestions-panel.panel.panel-default
+        .panel-heading Suggestion
+        .row
+          .col-xs-12.col-sm-4
+          .col-xs-12.col-sm-8
+            .map-container-suggestions
+              | {{> googleMap name="Map" options=MapOptions}}
 template(name='standardLegends')
-  | <span><img src='http://www.gravatar.com/avatar/{{gravatar}}?s=50'/></span><span style="color: {{color}}; background-color: {{bg}};">{{email}}</span>
+  | <span id='{{gravatar}}'><img src='http://www.gravatar.com/avatar/{{gravatar}}?s=40' class='img-circle mini-avatar'/> {{email}}</span>
