@@ -1,36 +1,24 @@
 template(name='friends')
   script(src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places")
   .container.row
-    .col-xs-12.col-sm-8
-      .suggestions
-        .home-options.panel.panel-default
-          .panel-heading Dashboard
-          .btn-group.btn-group-justified.padding-1-em
-            .btn.btn-default Friends
-            .btn.btn-default Find Place
-            .btn.btn-default Profile
-          ul.list-group
-            li.list-group-item
-              h5 Notfications
-              .alert.alert-info.alert-dismissible(role='alert')
-                button.close(type='button', data-dismiss='alert', aria-label='Close')
-                  span(aria-hidden='true') &times;
-                span.glyphicon.glyphicon-information-sign(aria-hidden='true')
-                  |   
-                span
-                  |   Rate to confirm visits or dismiss otherwise.
-
-        .map-container
-          //- | {{> googleMap name="Map"}}
-          | {{> googleMap name="Map" options=MapOptions}}
-    .col-xs-12.col-sm-4
-      .panel.panel-default.suggestions
-        // Default panel contents
-        .panel-heading Rate recent suggestions
-        ul.list-group.overflow-scroll
-          each profile.places
-            if (this.recent)
-              li.list-group-item
-                div #{this.name}
-                div #{this.type}
-                | {{> starsRating rating=this.rating size=16 mutable=true id=this.place_id}}
+    .col-xs-12
+      .panel.panel-default
+        .panel-heading Find New Friends
+        ul.list-group
+          li.list-group-item
+            .row 
+              .col-xs-12
+                br
+                | {{> inputAutocomplete settings=settings id="legend" class="form-control" name="legend" placeholder="Type in email of friend" }}
+            .row
+              .col-xs-10.group-container
+              .col-xs-2
+                br
+                .btn.pull-right.btn-default#add-friend-to-group Add New
+              //- input.form-control(type='text', placeholder="Type friends' email", aria-describedby='basic-addon1')
+  .container.row
+    .col-xs-12
+      .suggestions-panel.panel.panel-default
+        .panel-heading Your Friends
+        .row
+          .col-xs-12

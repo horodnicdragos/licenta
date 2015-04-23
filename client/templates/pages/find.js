@@ -1,5 +1,6 @@
 Friends = new Mongo.Collection();
 Group = new Mongo.Collection();
+var marker;
 function getFriends(){
     var data = Friends.find();
     if(Meteor.user()&&!data.count()){
@@ -11,7 +12,7 @@ function getFriends(){
       }
     }
 };
-getFriends = Meteor.setInterval(getFriends, 1000);
+// getFriends = Meteor.setInterval(getFriends, 1000);
 
 Template.find.helpers({
   settings: function() {
@@ -30,8 +31,6 @@ Template.find.helpers({
     };
   },
   legends: function() {
-
-    // console.log(Meteor.call('getFriends', Session.get('email')));
     return Friends.find({});
   }
 });
@@ -55,24 +54,36 @@ if (Meteor.isClient) {
 }
 Template.find.helpers({
   MapOptions: function() {
-    // Make sure the maps API has loaded
     if (GoogleMaps.loaded()) {
       // Map initialization options
-      return {
-        center: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
-        zoom: 8
-      };
+      if(Session.get('newLat')&&Session.get('newLon'))
+        {
+          return {
+            center: new google.maps.LatLng(Session.get('newLat'), Session.get('newLon')),
+            zoom: 16
+          };
+        }
+      else
+        {
+          return {
+            center: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
+            zoom: 16
+          };
+        }
     }
   }
 });
 
 Template.find.onCreated(function() {
   // We can use the `ready` callback to interact with the map API once the map is ready.
+  getFriends = Meteor.setInterval(getFriends, 1000);
   GoogleMaps.ready('Map', function(map) {
-    // Add a marker to the map once it's ready
-    var marker = new google.maps.Marker({
+    // Add a marker to the map once it's ready    
+    var gravatar = CryptoJS.MD5(Meteor.user().emails[0].address).toString();
+    marker = new google.maps.Marker({
       position: new google.maps.LatLng(Session.get('lat'), Session.get('lon')),
-      map: map.instance
+      map: map.instance,
+      icon: 'http://www.gravatar.com/avatar/'+gravatar+'?s=40'
     });
   });
 });
@@ -94,25 +105,38 @@ Template.find.events({
     }
     $('#legend').val('');
   },
-
   'click #find-places': function () {
     var places;
     var semaphore = 0;
-    Meteor.call('getPlaces', Session.get('lon'), Session.get('lat'), 1000, 'restaurant', function(err,results){
-        // console.log(results.content);
-        Session.set('places',JSON.parse(results.content));
-        places =  Session.get('places');
-        semaphore = 1;
-    });
+    if(Session.get('place-type')){
+      Meteor.call('getPlaces', Session.get('lon'), Session.get('lat'), 1000, Session.get('place-type'), function(err,results){
+          // console.log(results.content);
+          Session.set('places',JSON.parse(results.content));
+          places =  Session.get('places');
+          semaphore = 1;
+      });
+    }
+    else{
+      sweetAlert("Oops...", "You must pick a place type first!", "error");
+    }
     getPlaces = Meteor.setInterval(function(){
       if(semaphore === 1){
-      semaphore = 0;
-      console.log(places);
-      console.log(typeof(places));
-      Meteor.clearInterval(getPlaces);
-      //Iterating though the given places
+        semaphore = 0;
+        console.log(places);
+        console.log(typeof(places));
+        Meteor.clearInterval(getPlaces);
+        //Iterating though the given places
+
         places.results.forEach(function(el){
-          console.log(el.name);
+          // console.log(el);
+          // // sweetAlert(el.name);
+          console.log(el.geometry.location.lat+' '+el.geometry.location.lng);
+          var myLatLng = new google.maps.LatLng(el.geometry.location.lat, el.geometry.location.lng);
+          marker = new google.maps.Marker({
+            position: myLatLng,
+            map: GoogleMaps.maps.Map.instance
+          });
+          GoogleMaps.maps.Map.instance.setCenter(marker.getPosition());
         });
       }
     }, 1000);
@@ -128,7 +152,10 @@ Template.find.events({
     Friends.insert(obj[0]);
     Group.remove(obj[0]);
     $('#'+event.currentTarget.id).remove();
-
+  },
+  'click .click-place-type': function (event) {
+    var selected = event.currentTarget.getAttribute("data");
+    Session.set('place-type',selected);
   }
 });
 
@@ -152,7 +179,6 @@ Template.find.helpers({
       friends.forEach(function (el){
         Friends.insert(el);
       });
-
     }
 
 
@@ -162,5 +188,11 @@ Template.find.helpers({
   },
   gravatarHash: function() {
     return CryptoJS.MD5(Session.get('email')).toString();
+  },
+  placeType: function() {
+    if (Session.get('place-type'))
+      return Session.get('place-type');
+    else
+      return 'Pick'
   }
 });

@@ -6,42 +6,40 @@ template(name='find')
         .panel-heading Places Menu
         .panel-body
           .row
-            .col-sm-8
-              .row
-                .col-xs-12
-                  span What kind of place are you looking for? 
-              .row
-                .col-xs-12
-                  //- .btn-group.btn-group-justified
-                  span.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-expanded='false')
-                    | Pick
-                    span.caret
-                  ul.dropdown-menu(role='menu')
-                    li
-                      a(href='#') Food
-                    li
-                      a(href='#') Cafe & Bar
-                    li
-                      a(href='#') Park
-                    li
-                      a(href='#') Library
-                    li
-                      a(href='#') Club
-                    li
-                      a(href='#') Clothing
-                    li
-                      a(href='#') Mall
-                    li
-                      a(href='#') Cinema
-                    li.divider
-                    li
-                      a(href='#') Random
-            .col-sm-4
+            .col-xs-12
+              span What kind of place are you looking for? 
+          .row
+            .col-xs-12
+              //- .btn-group.btn-group-justified
+              span.btn.btn-default.dropdown-toggle#place-type(type='button', data-toggle='dropdown', aria-expanded='false')
+                | {{placeType}}
+                span.caret
+              ul.dropdown-menu(role='menu')
+                li.click-place-type(data='Food')
+                  a(href='#') Food
+                li.click-place-type(data='Cafe & Bar')
+                  a(href='#') Cafe & Bar
+                li.click-place-type(data='Park')
+                  a(href='#') Park
+                li.click-place-type(data='Library')
+                  a(href='#') Library
+                li.click-place-type(data='Club')
+                  a(href='#') Club
+                li.click-place-type(data='Clothing')
+                  a(href='#') Clothing
+                li.click-place-type(data='Mall')
+                  a(href='#') Mall
+                li.click-place-type(data='Cinema')
+                  a(href='#') Cinema
+                li.divider
+                li.click-place-type(data='Random')
+                  a(href='#') Random
               .btn-group.pull-right#find-places
                 .btn.btn-primary Find Place
         ul.list-group
           li.list-group-item
             .row
+              br
               .col-xs-12 Friends (for group based recommendations)
             .row 
               .col-xs-12

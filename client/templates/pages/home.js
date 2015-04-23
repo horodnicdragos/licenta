@@ -8,6 +8,20 @@ if (Meteor.isClient) {
     });
   });
 }
+
+Deps.autorun(function() {
+  if (Meteor.loggingIn()){
+    // Meteor._reload.reload();
+  }
+  if (!Meteor.user()) {
+    Friends.remove({});
+    Group.remove({});
+    People.remove({});
+    return;
+  }
+});
+
+
 Template.home.helpers({
   MapOptions: function() {
     // Make sure the maps API has loaded
@@ -32,7 +46,11 @@ Template.home.onCreated(function() {
   });
 });
 
-
+Template.header.events({
+  'click #login-buttons-logout': function(){
+    Meteor._reload.reload();
+  }
+});
 // Logic
 Template.home.events({
   'click #searchBookBtn': function () {
@@ -54,6 +72,7 @@ Template.home.events({
     }
     var rating = $('#'+this.id).data('userrating');
     Meteor.call('updateRecentPlaceRating', email, rating, this.id);
+    swal({   title: "Thank you!",   text: "Your rating will help us suggest the best places.",   timer: 1000, type: "success",   showConfirmButton: false });
 
   }
 });
