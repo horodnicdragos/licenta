@@ -1,104 +1,126 @@
+var place;
+var lat = 44.435527;
+var lon = 26.102486;
+
 Template.profile.helpers({
-  borrowedBooks: function () {
-
-    var c = Books.find({currentUser: Meteor.user()._id});
-    var d = [];
-
-    c.forEach( function(elem) {
-      d.push(elem);
-    });
-    console.log(d);
-    return d;
-  },
-  username: function () {
-    if (Meteor.user()) {
-      var name = Meteor.user().profile.name || Meteor.user().emails[0].address;
-      var city = Meteor.user().profile.city;
-      var country = Meteor.user().profile.country;
-      var mail = Meteor.user().emails[0].address;
-      return {
-        'name': name,
-        'country': country,
-        'city': city,
-        'mail': mail
-      };
-    } else {
-      return 'You are not logged in!';
-    }
-
-
-  },
-
-  // borrowedBooks: function () {
-  //
-  //   var books = [];
-  //   var borrowedBooks = Meteor.user().borrowedBooks[0];
-  //
-  //   console.log('caca', borrowedBooks);
-  //
-  //   //
-  //   // return [
-  //   //   {
-  //   //     'thumbnail': 'http://placekitten.com/g/200/300/',
-  //   //     'daysLeft': '4'
-  //   //   },
-  //   //   {
-  //   //     'thumbnail': 'http://placekitten.com/g/200/300/',
-  //   //     'daysLeft': '28'
-  //   //   },
-  //   //   {
-  //   //     'thumbnail': 'http://placekitten.com/g/200/300/',
-  //   //     'daysLeft': '11'
-  //   //   }
-  //   // ];
-  // },
-
-  booksRead: function () {
-    return '5';
-  },
   gravatarHash: function() {
-    return CryptoJS.MD5(Session.get('email')).toString()
+    return CryptoJS.MD5(Meteor.user().emails[0].address).toString();
+  },
+  friends: function(){
+    return Profiles.find({email:Meteor.user().emails[0].address}, {friends:1}).fetch()[0].friends.length;
+  },
+  places: function(){
+    return Profiles.find({email:Meteor.user().emails[0].address}, {places:1}).fetch()[0].places.length;
   }
 });
 
-Template.profile.events({
-  'click #ok-button': function () {
+if (Meteor.isClient) {
+  Meteor.startup(function() {
+    GoogleMaps.load({
+      key: 'AIzaSyBs0-kUSnnfeqJCQgePm6FJ_gBJ8l9lMuc',
+      libraries: 'places'
+    });
+  });
+}
 
-    var name = $('input#name').val().length > 0 ? $('input#name').val() : Meteor.user().profile.name;
-    var city = $('input#city').val().length > 0 ? $('input#city').val() : Meteor.user().profile.city;
-    var country = $('input#country').val().length > 0 ? $('input#country').val() : Meteor.user().profile.country;
-    var mail = $('input#email').val().length > 0 ? $('input#email').val() : Meteor.user().emails[0].address;
-
-    Meteor.users.update({
-      _id: Meteor.user()._id
-    },
-    {
-      $set:{
-        'profile': {
-          'name': name,
-          'city': city,
-          'country': country,
-          'mail': mail,
-          'readPoints': 10
+Template.profile.rendered = function() {
+  Tracker.autorun(function () {
+    if (GoogleMaps.loaded()) {
+      $("#place").geocomplete({
+        map: GoogleMaps.maps.placesMap.instance,
+        bounds: GoogleMaps.maps.placesMap.instance.getBounds(),
+        types: ['establishment']
         }
-      }
+        );
+    $("#place")
+      .geocomplete()
+      .bind("geocode:result", function(event, result){
+        console.log(result);
+        place = result;
+      });
     }
-  );
-  $('input#name').val('');
-  $('input#city').val('');
-  $('input#country').val('');
-  $('input#email').val('');
-},
-  'click #doneReading': function () {
+  });
+}
 
-    var c = $('.progress-bar').css('width');
-    c = parseInt(c, 10);
-    c = c + ((c * 10)/100);
-    var d = $('.progress-bar').css('width', c);
-    $('.progress-bar').css('width', c);
-    var superid = $('.book').attr('id');
-    
-    $('#'+superid).addClass('hidden');
-    console.log($(this));
+Template.profile.helpers({
+  mapOptions: function() {
+    // Make sure the maps API has loaded
+    if (GoogleMaps.loaded()) {
+      // Map initialization options
+      return {
+        center: new google.maps.LatLng(lat,lon),
+        // center: new google.maps.LatLng(Session.get('lat'),Session.get('lon')),
+        zoom: 11
+      };
+
+    }
+  }
+});
+
+Template.profile.onCreated(function() {
+  // We can use the `ready` callback to interact with the map API once the map is ready.
+  GoogleMaps.ready('placesMap', function(map) {
+    console.log(GoogleMaps.maps.placesMap.instance.getBounds());
+    // Add a marker to the map once it's ready
+    var marker = new google.maps.Marker({
+      position: map.options.center,
+      map: map.instance
+    });
+  });
+});
+
+Template.profile.events({
+  'click #add-place': function () {
+    console.log('merge');
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+    }
+    var rating = $('#newRating').data('userrating');
+    var places = Profiles.find({'email': email}).fetch()[0].places;
+    var exists = false;
+    console.log(places);
+    places.forEach(function(el){
+      if (el.place_id===place.place_id)
+        exists = true;
+    });
+    if(rating!=undefined)
+    {
+      Meteor.call('updatePlaces', email, place.name, place.types, place.place_id, rating, false);
+      if(!exists)
+      {
+          sweetAlert({   title: place.name,
+               text: place.adr_address+"<br><br>Thank you for rating! If you change your mind you can always attribuite a new rating to your current places.",
+               html: true,
+               type: 'success' });
+      }        
+      else
+      {
+          sweetAlert({   title: place.name,
+               text: place.adr_address+"<br><br>This place is already on your list!",
+               html: true,
+               type: 'error' });
+      } 
+    }
+    else
+    {
+      Meteor.call('updatePlaces',email, place.name, place.types, place.place_id, 0, true)
+      if(!exists)
+      {
+          sweetAlert({   title: place.name,
+               text: place.adr_address+"<br><br>Don't forget to rate this place!",
+               html: true,
+               type: 'info' });
+      }        
+      else
+      {
+          sweetAlert({   title: place.name,
+               text: place.adr_address+"<br><br>This place is already on your list!",
+               html: true,
+               type: 'error' });
+      } 
+    }
+
+    console.log(place);
+
   }
 });

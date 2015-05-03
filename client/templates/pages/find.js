@@ -88,16 +88,26 @@ Template.find.onCreated(function() {
   });
 });
 
+setInterval(function(){
+  $('#hover-friend').fadeIn(500);
+  $('#hover-friend').fadeOut(500);
+}, 1000);
 
 // Logic
 Template.find.events({
   'click #add-friend-to-group': function () {
     var email = $('#legend').val();
     if (Friends.find({'email':email}).count()){
-    console.log(email);
     var gravatar = CryptoJS.MD5(email).toString();
-    console.log(gravatar);
-    $('.group-container').append("<span class='click-avatar' id='"+gravatar+"'><span data-content='✕' class='image'><img src='http://www.gravatar.com/avatar/"+gravatar+"?s=40' class='img-circle mini-avatar'/></span></span>");
+    // $('.group-container').append("<span class='click-avatar' id='"+gravatar+"'><span data-content='✕' class='image'><img src='http://www.gravatar.com/avatar/"+gravatar+"?s=40' class='img-circle mini-avatar'/></span></span>");
+    $('#hover-friend').html('Click on the pictures to remove friends...');
+    $('#'+gravatar).hover(
+      function(){
+        $('#hover-friend').html('Remove '+email);
+      },
+      function(){
+        $('#hover-friend').html('Click on the pictures to remove friends...');
+      });
     var obj = Friends.find({'email':email}).fetch();
     console.log(obj[0].email);
     Group.insert(obj[0]);
@@ -119,7 +129,7 @@ Template.find.events({
     else{
       sweetAlert("Oops...", "You must pick a place type first!", "error");
     }
-    getPlaces = Meteor.setInterval(function(){
+    var getPlaces = Meteor.setInterval(function(){
       if(semaphore === 1){
         semaphore = 0;
         console.log(places);
@@ -145,6 +155,7 @@ Template.find.events({
     // $('.borrow').parent().html("<i class='fa fa-check fa-3x' style='color: #009E78;'></i>");
   },
   'click .click-avatar': function (event) {
+    $('#hover-friend').html('');
     console.log(event.currentTarget.id);
     var gravatar = event.currentTarget.id;
     var obj = Group.find({'gravatar':gravatar}).fetch();
@@ -194,5 +205,8 @@ Template.find.helpers({
       return Session.get('place-type');
     else
       return 'Pick'
+  },
+  group: function() {
+    return Group.find({});
   }
 });

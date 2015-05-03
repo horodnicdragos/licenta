@@ -7,6 +7,7 @@ function getFriends(){
       var email = Meteor.user().emails[0].address;
       Profiles.find({}).fetch().forEach(function(el){
         People.insert({'email':el.email, gravatar:CryptoJS.MD5(el.email).toString()});
+
       });
         Meteor.clearInterval(getFriends);
       // var friends = Profiles.find({'email': email}, {fields:{'friends':1}}).fetch()[0].friends;
@@ -111,7 +112,10 @@ Template.friends.events({
              html: true });
     // TODO DE INLOCUIT TOATE SESSION GET CU QUERY
     Meteor.call('updateFriends', Meteor.user().emails[0].address, email);
-    Friends.insert({ email: email , gravatar:gravatar});
+
+    if(Meteor.user()&&Friends.find().count()){
+      Friends.insert({ email: email , gravatar:gravatar});
+    }
     }
     // $('.group-container').append("<span class='click-avatar' id='"+gravatar+"'><span data-content='✕' class='image'><img src='http://www.gravatar.com/avatar/"+gravatar+"?s=40' class='img-circle mini-avatar'/></span></span>");
     // var obj = Friends.find({'email':email}).fetch();
@@ -122,70 +126,16 @@ Template.friends.events({
 
     $('#legend').val('');
   },
-  'click #find-places': function () {
-    var places;
-    var semaphore = 0;
-    if(Session.get('place-type')){
-      Meteor.call('getPlaces', Session.get('lon'), Session.get('lat'), 1000, Session.get('place-type'), function(err,results){
-          // console.log(results.content);
-          Session.set('places',JSON.parse(results.content));
-          places =  Session.get('places');
-          semaphore = 1;
-      });
-    }
-    else{
-      sweetAlert("Oops...", "You must pick a place type first!", "error");
-    }
-    getPlaces = Meteor.setInterval(function(){
-      if(semaphore === 1){
-        semaphore = 0;
-        console.log(places);
-        console.log(typeof(places));
-        Meteor.clearInterval(getPlaces);
-        //Iterating though the given places
-
-        places.results.forEach(function(el){
-          // console.log(el);
-          // // sweetAlert(el.name);
-          console.log(el.geometry.location.lat+' '+el.geometry.location.lng);
-          var myLatLng = new google.maps.LatLng(el.geometry.location.lat, el.geometry.location.lng);
-          marker = new google.maps.Marker({
-            position: myLatLng,
-            map: GoogleMaps.maps.Map.instance
-          });
-          GoogleMaps.maps.Map.instance.setCenter(marker.getPosition());
-        });
-      }
-    }, 1000);
-    // Books.update ({'_id':this._id}, {$set: {'currentUser': Meteor.user()._id }});
-    // Meteor.users.update ({'_id': Meteor.user()._id}, {$addToSet: {'borrowedBooks': this._id}});
-    // $('.borrow').parent().html("<i class='fa fa-check fa-3x' style='color: #009E78;'></i>");
-  },
   'click .click-avatar': function (event) {
-    console.log(event.currentTarget.id);
-    var gravatar = event.currentTarget.id;
-    var obj = Group.find({'gravatar':gravatar}).fetch();
-    console.log(obj);
-    Friends.insert(obj[0]);
-    Group.remove(obj[0]);
-    $('#'+event.currentTarget.id).remove();
-  },
-  'click .click-place-type': function (event) {
-    var selected = event.currentTarget.getAttribute("data");
-    Session.set('place-type',selected);
+    var email = event.currentTarget.getAttribute('data');
+    console.log(email);
+    Friends.remove({email:email});
+    Meteor.call('removeFriend',Meteor.user().emails[0].address, email);
+    
   }
 });
 
 Template.friends.helpers({
-  books: function() {
-    var a = [];
-    var x = Books.find({});
-    x.forEach( function(elem) {
-      a.push(elem);
-    });
-    console.log(a);
-    return a;
-  },
   profile: function() {
     if(Meteor.user()){
       var email = Meteor.user().emails[0].address;
@@ -197,9 +147,6 @@ Template.friends.helpers({
         Friends.insert(el);
       });
     }
-
-
-
     var profile = Profiles.findOne({email:email});
     return profile;
   },
@@ -211,5 +158,13 @@ Template.friends.helpers({
       return Session.get('place-type');
     else
       return 'Pick'
+  },
+  friends: function () {
+    var emails = Profiles.findOne({email:Meteor.user().emails[0].address}).friends;
+    var friends = [];
+    emails.forEach(function (el){
+      friends.push({email:el, gravatar:CryptoJS.MD5(el).toString()});
+    });
+    return friends;
   }
 });

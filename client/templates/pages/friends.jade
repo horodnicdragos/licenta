@@ -22,3 +22,9 @@ template(name='friends')
         .panel-heading Your Friends
         .row
           .col-xs-12
+            each friends
+              span.click-avatar(id=this.gravatar,data=this.email)
+                span.image(data-content='✕')
+                  img.img-circle.mini-avatar(src='http://www.gravatar.com/avatar/{{this.gravatar}}?s=40')
+template(name='standardLegendsFriends')
+  | <span id='{{gravatar}}'><img src='http://www.gravatar.com/avatar/{{gravatar}}?s=40' class='img-circle mini-avatar'/> {{email}}</span>

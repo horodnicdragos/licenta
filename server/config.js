@@ -21,13 +21,44 @@ Meteor.methods({
   updateRecentPlaceRating: function (email, rating, id) {
     check(email, String);
     check(rating, Number);
-    check(id, Number);
-    Profiles.update ({'email': email, 'places.place_id':id}, {$set: {'places.$.rating': rating }});
+    check(id, String);
+    Profiles.update ({'email': email, 'places.place_id':id}, {$set: {'places.$.rating': rating, 'places.$.recent': false }});
   },
   updateFriends: function (email, friend_email) {
     check(email, String);
     check(friend_email, String);
     Profiles.update ({'email': email}, {$addToSet: {'friends': friend_email }});
+  },
+  removeFriend: function (email, friend_email) {
+    check(email, String);
+    check(friend_email, String);
+    Profiles.update ({'email': email}, {$pull: {'friends': friend_email }});
+  },
+  updatePlaces: function (email, name, types_array, id, rating, recent) {
+    check(email, String);
+    check(name, String);
+    check(types_array, Array);
+    check(id, String);
+    check(rating, Number);
+    check(recent, Boolean);
+    var places = Profiles.find({'email': email}).fetch()[0].places;
+    var exists = false;
+    console.log(places);
+    places.forEach(function(el){
+      console.log(el.place_id);
+      if (el.place_id===id)
+        exists = true;
+    });
+    if (!exists) {
+      Profiles.update ({'email': email}, {$addToSet: {'places': {
+                            name: name,
+                            types: types_array,
+                            place_id: id,
+                            rating: rating,
+                            recent: recent }
+                                        }
+                        });
+    }
   },
   getPlaces: function(lon, lat, radius, type){
     check(lon, Number);

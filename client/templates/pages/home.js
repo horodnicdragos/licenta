@@ -53,19 +53,6 @@ Template.header.events({
 });
 // Logic
 Template.home.events({
-  'click #searchBookBtn': function () {
-    var a = Books.findOne({
-      name: $('input#searchBook').val()
-    });
-    console.log(a);
-    $('.bookResult').html();
-  },
-
-  'click .borrow': function () {
-    Books.update ({'_id':this._id}, {$set: {'currentUser': Meteor.user()._id }});
-    Meteor.users.update ({'_id': Meteor.user()._id}, {$addToSet: {'borrowedBooks': this._id}});
-    $('.borrow').parent().html("<i class='fa fa-check fa-3x' style='color: #009E78;'></i>");
-  },
   'click .stars-rating': function () {
     if(Meteor.user()){
       var email = Meteor.user().emails[0].address;

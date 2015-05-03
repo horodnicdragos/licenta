@@ -42,14 +42,22 @@ template(name='find')
               br
               .col-xs-12 Friends (for group based recommendations)
             .row 
-              .col-xs-12
+              .col-xs-10
                 br
                 | {{> inputAutocomplete settings=settings id="legend" class="form-control" name="legend" placeholder="Type in email of friend" }}
-            .row
-              .col-xs-10.group-container
               .col-xs-2
                 br
                 .btn.pull-right.btn-default#add-friend-to-group Add
+            .row
+              .col-xs-12
+                each group
+                  span.click-avatar(id=this.gravatar)
+                    span.image(data-content='✕')
+                      img.img-circle.mini-avatar(src='http://www.gravatar.com/avatar/{{this.gravatar}}?s=40')
+            .row
+              .col-xs-12#hover-friend
+
+
               //- input.form-control(type='text', placeholder="Type friends' email", aria-describedby='basic-addon1')
   .container.row
     .col-xs-12
