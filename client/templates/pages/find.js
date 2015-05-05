@@ -116,14 +116,15 @@ Template.find.events({
     $('#legend').val('');
   },
   'click #find-places': function () {
-    var places;
+    var places = [];
     var semaphore = 0;
     if(Session.get('place-type')){
-      Meteor.call('getPlaces', Session.get('lon'), Session.get('lat'), 1000, Session.get('place-type'), function(err,results){
+      Meteor.call('recommendPlaces', Session.get('lon'), Session.get('lat'), Session.get('place-type'), Meteor.user().emails[0].address, 1000, function(err,results){
           // console.log(results.content);
-          Session.set('places',JSON.parse(results.content));
-          places =  Session.get('places');
+          // Session.set('places',JSON.parse(results.content));
+          // places =  Session.get('places');
           semaphore = 1;
+          places = results;
       });
     }
     else{
@@ -137,17 +138,17 @@ Template.find.events({
         Meteor.clearInterval(getPlaces);
         //Iterating though the given places
 
-        places.results.forEach(function(el){
-          // console.log(el);
-          // // sweetAlert(el.name);
-          console.log(el.geometry.location.lat+' '+el.geometry.location.lng);
-          var myLatLng = new google.maps.LatLng(el.geometry.location.lat, el.geometry.location.lng);
-          marker = new google.maps.Marker({
-            position: myLatLng,
-            map: GoogleMaps.maps.Map.instance
-          });
-          GoogleMaps.maps.Map.instance.setCenter(marker.getPosition());
-        });
+        // places.results.forEach(function(el){
+        //   // console.log(el);
+        //   // // sweetAlert(el.name);
+        //   console.log(el.geometry.location.lat+' '+el.geometry.location.lng);
+        //   var myLatLng = new google.maps.LatLng(el.geometry.location.lat, el.geometry.location.lng);
+        //   marker = new google.maps.Marker({
+        //     position: myLatLng,
+        //     map: GoogleMaps.maps.Map.instance
+        //   });
+        //   GoogleMaps.maps.Map.instance.setCenter(marker.getPosition());
+        // });
       }
     }, 1000);
     // Books.update ({'_id':this._id}, {$set: {'currentUser': Meteor.user()._id }});
