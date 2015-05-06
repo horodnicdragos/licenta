@@ -23,6 +23,9 @@ Deps.autorun(function() {
 
 
 Template.home.helpers({
+  gravatarHash: function() {
+    return CryptoJS.MD5(Meteor.user().emails[0].address).toString();
+  },
   MapOptions: function() {
     // Make sure the maps API has loaded
     if (GoogleMaps.loaded()) {

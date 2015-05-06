@@ -2,18 +2,20 @@ template(name='home')
   script(src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places")
   .container.row
     .col-xs-12.col-sm-8
-      .suggestions
-        .home-options.panel.panel-default
-          .panel-heading Dashboard
-          .btn-group.btn-group-justified.padding-1-em
-            a.btn.btn-default(href='/friends') Friends
-            a.btn.btn-default(href='/find') Find Place
-            a.btn.btn-default(href='/profile') Profile
-          ul.list-group
-            li.list-group-item
-              h5 Info
-              p Rate to confirm visits or dismiss otherwise.
-
+      .panel.panel-default.suggestions
+        .panel-heading Dashboard
+        .btn-group.btn-group-justified.padding-1-em
+          a.btn.btn-default(href='/friends') Friends
+          a.btn.btn-default(href='/find') Find Place
+          a.btn.btn-default(href='/profile') Profile
+        ul.list-group
+          li.list-group-item
+            .row
+              .col-sm-3
+                img(src='http://www.gravatar.com/avatar/{{gravatarHash}}?s=100').img-circle.center-block
+              .col-sm-9
+                h5 Info
+                p Rate to confirm visits or dismiss otherwise.
         .map-container
           | {{> googleMap name="Map" options=MapOptions}}
     .col-xs-12.col-sm-4
