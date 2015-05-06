@@ -7,7 +7,8 @@ Template.profile.helpers({
     return CryptoJS.MD5(Meteor.user().emails[0].address).toString();
   },
   friends: function(){
-    return Profiles.find({email:Meteor.user().emails[0].address}, {friends:1}).fetch()[0].friends.length;
+    if(Meteor.user())
+      return Profiles.find({email:Meteor.user().emails[0].address}, {friends:1}).fetch()[0].friends.length;
   },
   places: function(){
     return Profiles.find({email:Meteor.user().emails[0].address}, {places:1}).fetch()[0].places.length;
@@ -54,6 +55,10 @@ Template.profile.helpers({
       };
 
     }
+  },
+  profile: function() {
+    if(Meteor.user())
+      return Profiles.findOne({email:Meteor.user().emails[0].address});
   }
 });
 
@@ -122,5 +127,19 @@ Template.profile.events({
 
     console.log(place);
 
+  },
+  'click .stars-rating': function () {
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+    }
+    var rating = $('#'+this.id).data('userrating');
+    Meteor.call('updateRecentPlaceRating', email, rating, this.id);
+
+  },
+  'click .dismiss': function () {
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+    }
+    Meteor.call('removePlace', email, this.name, this.types, this.place_id, this.rating, false);
   }
 });

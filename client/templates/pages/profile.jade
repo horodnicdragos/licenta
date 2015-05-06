@@ -26,4 +26,15 @@ template(name='profile')
               .btn.pull-right.btn-default#add-place Add
           #new-place-map
             | {{> googleMap name="placesMap" options=mapOptions}}
-
+    br
+    .row
+      .col-xs-12
+        .panel.panel-default
+          .panel-heading My places
+          ul.list-group.overflow-scroll
+            each profile.places
+              unless (this.recent)
+                li.list-group-item
+                  div #{this.name}
+                  | {{> starsRating rating=this.rating size=16 mutable=true id=this.place_id}}
+                  button.dismiss.btn.btn-default(type='button') Remove

@@ -61,6 +61,13 @@ Template.home.events({
     Meteor.call('updateRecentPlaceRating', email, rating, this.id);
     swal({   title: "Thank you!",   text: "Your rating will help us suggest the best places.",   timer: 1000, type: "success",   showConfirmButton: false });
 
+  },
+  'click .dismiss': function () {
+    if(Meteor.user()){
+      var email = Meteor.user().emails[0].address;
+    }
+    console.log(this);
+    Meteor.call('removePlace', email, this.name, this.types, this.place_id, 0, true);
   }
 });
 

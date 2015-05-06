@@ -3,34 +3,13 @@ template(name='settings')
     h1 Settings
     hr
     .user-info
-      .mail.hidden
-        span #{username.mail}
       .panel.panel-default
         .panel-heading
-          h3.panel-title Basic information
+          h3.panel-title Radius Settings
         .panel-body
           .row
-            .col-sm-offset-2.col-xs-3
-              p Name
-            .col-xs-9.col-sm-6
-              p
-                input.form-control#name(type='text', placeholder='Edit Name ...')
-          .row
-            .col-sm-offset-2.col-xs-3
-              p Email
-            .col-xs-9.col-sm-6
-              p
-                input.form-control#email(type='email', placeholder='Edit Email ...')
-          .row
-            .col-sm-offset-2.col-xs-3
-              p City
-            .col-xs-9.col-sm-6
-              p
-                input.form-control#city(type='text', placeholder='Edit City ...')
-          .row
-            .col-sm-offset-2.col-xs-3
-              p Country
-            .col-xs-9.col-sm-6
-              p
-                input.form-control#country(type='text', placeholder='Edit Country ...')
+            .col-xs-12
+              .pull-left 100m
+              .pull-right 2km
+              input#radius(type='range', min='100', max='2000', step='100')
           button#ok-button.btn.btn-default.pull-right(type='button') Save

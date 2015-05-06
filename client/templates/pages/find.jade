@@ -65,6 +65,8 @@ template(name='find')
         .panel-heading Suggestion
         .row
           .col-xs-12.col-sm-4
+            h3 #{placeName}
+            p#address-space
           .col-xs-12.col-sm-8
             .map-container-suggestions
               | {{> googleMap name="Map" options=MapOptions}}
